@@ -19,22 +19,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-
-jwt:
-  secret: ${JWT_SECRET:mySecretKey12345678901234567890123456789012345678901234567890}
-  expiration: 86400000 # 24 hours in milliseconds
-
-logging:
-  level:
-    com.aiweb.auth: DEBUG
-    org.springframework.security: DEBUG
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-  api-docs:
-    path: /v3/api-docs
-
+  
   security:
     oauth2:
       client:
@@ -55,3 +40,18 @@ springdoc:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+jwt:
+  secret: ${JWT_SECRET:mySecretKey12345678901234567890123456789012345678901234567890}
+  expiration: 86400000 # 24 hours in milliseconds
+
+logging:
+  level:
+    com.aiweb.auth: DEBUG
+    org.springframework.security: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

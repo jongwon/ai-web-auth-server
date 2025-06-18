@@ -38,6 +38,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private OAuth2User processKakaoUser(OAuth2User oAuth2User) {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> profile = kakaoAccount != null ? 
+                (Map<String, Object>) kakaoAccount.get("profile") : null;
         
         String email = null;
         if (kakaoAccount != null && kakaoAccount.containsKey("email")) {
@@ -52,17 +54,40 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         
         final String finalEmail = email;
         User user = userRepository.findByEmail(finalEmail)
-                .orElseGet(() -> createKakaoUser(finalEmail, oAuth2User));
+                .map(existingUser -> updateKakaoUser(existingUser, profile))
+                .orElseGet(() -> createKakaoUser(finalEmail, profile));
         
         return new KakaoOAuth2User(oAuth2User, finalEmail);
     }
     
-    private User createKakaoUser(String email, OAuth2User oAuth2User) {
+    private User createKakaoUser(String email, Map<String, Object> profile) {
+        String nickname = profile != null ? (String) profile.get("nickname") : null;
+        String profileImage = profile != null ? (String) profile.get("profile_image_url") : null;
+        
         User user = User.builder()
                 .email(email)
                 .password(UUID.randomUUID().toString()) // 임시 비밀번호
+                .name(nickname)
+                .profileImage(profileImage)
                 .build();
         
         return userRepository.save(user);
+    }
+    
+    private User updateKakaoUser(User user, Map<String, Object> profile) {
+        if (profile != null) {
+            String nickname = (String) profile.get("nickname");
+            String profileImage = (String) profile.get("profile_image_url");
+            
+            if (nickname != null) {
+                user.setName(nickname);
+            }
+            if (profileImage != null) {
+                user.setProfileImage(profileImage);
+            }
+            
+            return userRepository.save(user);
+        }
+        return user;
     }
 }
