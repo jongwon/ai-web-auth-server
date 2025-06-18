@@ -1,0 +1,36 @@
+server:
+  port: 15201
+
+spring:
+  application:
+    name: auth-server
+    
+  datasource:
+    url: jdbc:postgresql://localhost:15200/auth_db
+    username: auth_user
+    password: auth_password
+    driver-class-name: org.postgresql.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+jwt:
+  secret: ${JWT_SECRET:mySecretKey12345678901234567890123456789012345678901234567890}
+  expiration: 86400000 # 24 hours in milliseconds
+
+logging:
+  level:
+    com.aiweb.auth: DEBUG
+    org.springframework.security: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
