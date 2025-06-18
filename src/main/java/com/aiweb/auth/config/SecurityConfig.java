@@ -1,5 +1,8 @@
 package com.aiweb.auth.config;
 
+import com.aiweb.auth.oauth2.CustomOAuth2UserService;
+import com.aiweb.auth.oauth2.OAuth2AuthenticationFailureHandler;
+import com.aiweb.auth.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.aiweb.auth.security.JwtAuthenticationFilter;
 import com.aiweb.auth.security.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,9 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -64,7 +70,15 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                 .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(userInfo -> userInfo
+                    .userService(customOAuth2UserService)
+                )
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler)
             );
         
         http.authenticationProvider(authenticationProvider());

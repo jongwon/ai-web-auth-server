@@ -9,11 +9,14 @@ import com.aiweb.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -43,5 +46,11 @@ public class AuthController {
     public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
         User user = authService.getCurrentUser(userPrincipal.getEmail());
         return ResponseEntity.ok(user);
+    }
+    
+    @GetMapping("/oauth2/kakao")
+    @Operation(summary = "카카오 로그인", description = "카카오 OAuth2 로그인 페이지로 리다이렉트")
+    public void kakaoLogin(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/oauth2/authorization/kakao");
     }
 }
