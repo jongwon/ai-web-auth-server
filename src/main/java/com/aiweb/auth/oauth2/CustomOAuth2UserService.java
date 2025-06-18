@@ -50,10 +50,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             email = "kakao_" + kakaoId + "@kakao.local";
         }
         
-        User user = userRepository.findByEmail(email)
-                .orElseGet(() -> createKakaoUser(email, oAuth2User));
+        final String finalEmail = email;
+        User user = userRepository.findByEmail(finalEmail)
+                .orElseGet(() -> createKakaoUser(finalEmail, oAuth2User));
         
-        return new KakaoOAuth2User(oAuth2User, email);
+        return new KakaoOAuth2User(oAuth2User, finalEmail);
     }
     
     private User createKakaoUser(String email, OAuth2User oAuth2User) {
